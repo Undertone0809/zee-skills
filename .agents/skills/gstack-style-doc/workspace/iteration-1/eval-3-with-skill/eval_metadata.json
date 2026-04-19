@@ -1,0 +1,6 @@
+{
+  "eval_id": 3,
+  "eval_name": "library-state-management",
+  "prompt": "我开源了一个 React 状态管理库 nano-store，只有 1KB 但功能完整，支持原子化状态、派生状态和异步动作。用 gstack 风格写 README。",
+  "assertions": []
+}

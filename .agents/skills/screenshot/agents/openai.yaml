@@ -1,0 +1,6 @@
+interface:
+  display_name: "Screenshot Capture"
+  short_description: "Capture screenshots"
+  icon_small: "./assets/screenshot-small.svg"
+  icon_large: "./assets/screenshot.png"
+  default_prompt: "Capture the right screenshot without interrupting the user's current work. Prefer a specific app or window over the full desktop unless they asked for full screen."

@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "gstack-style-doc", "runs": [{"id": "eval-1-baseline", "prompt": "\u6211\u7684\u65b0\u9879\u76ee\u662f\u4e00\u4e2a\u6570\u636e\u5e93\u8fc1\u79fb\u5de5\u5177\uff0c\u53eb\u505a migrate-pro\u3002\u5b83\u80fd\u5206\u6790 SQL \u8fc1\u79fb\u811a\u672c\u7684\u98ce\u9669\uff0c\u9884\u4f30\u6267\u884c\u65f6\u95f4\u548c\u56de\u6eda\u7b56\u7565\u3002\u8bf7\u7ed9\u6211\u5199\u4e00\u4e2a gstack \u98ce\u683c\u7684 README\u3002", "eval_id": 1, "outputs": [{"name": "README.md", "type": "text", "content": "# migrate-pro\n\nA database migration tool that analyzes SQL migration risks, estimates execution time, and handles rollback strategies.\n\n## Features\n\n- **Risk Analysis**: Scans migrations for potentially dangerous operations like table drops, column deletions, or schema changes that could cause data loss\n- **Execution Time Estimation**: Predicts how long migrations will take based on table size, index complexity, and operation type\n- **Rollback Strategies**: Automatically generates rollback scripts and validates their safety before execution\n- **Dry Run Mode**: Preview migration effects without making actual changes\n- **Multi-Database Support**: Works with PostgreSQL, MySQL, and SQLite\n\n## Installation\n\n```bash\nnpm install -g migrate-pro\n```\n\nOr install locally in your project:\n\n```bash\nnpm install --save-dev migrate-pro\n```\n\n## Quick Start\n\n```bash\n# Initialize migrate-pro in your project\nmigrate-pro init\n\n# Add a new migration\nmigrate-pro create add_users_table\n\n# Analyze migration risks before running\nmigrate-pro analyze\n\n# Run pending migrations\nmigrate-pro up\n\n# Rollback last migration\nmigrate-pro down\n```\n\n## Configuration\n\nCreate a `migrate-pro.config.js` file in your project root:\n\n```javascript\nmodule.exports = {\n  database: {\n    client: 'postgresql',\n    connection: {\n      host: 'localhost',\n      port: 5432,\n      database: 'myapp',\n      user: 'postgres',\n      password: process.env.DB_PASSWORD\n    }\n  },\n  migrations: {\n    directory: './migrations',\n    tableName: 'migrations'\n  },\n  analysis: {\n    // Warn if estimated execution time exceeds 30 seconds\n    maxExecutionTimeWarning: 30000,\n    // Block migrations that would affect more than 1 million rows\n    maxRowsAffected: 1000000,\n    // Require rollback scripts for destructive operations\n    requireRollbackForDestructiveOps: true\n  }\n};\n```\n\n## Risk Analysis\n\nmigrate-pro analyzes each migration for potential risks:\n\n| Risk Level | Description | Examples |\n|------------|-------------|----------|\n| **Critical** | Operations that will cause data loss | `DROP TABLE`, `DROP COLUMN`, destructive type changes |\n| **High** | Operations that may cause downtime or performance issues | Adding indexes on large tables, altering column types |\n| **Medium** | Operations requiring caution | Adding nullable columns, creating new tables |\n| **Low** | Generally safe operations | Adding indexes on small tables, creating views |\n\nExample risk report:\n\n```bash\n$ migrate-pro analyze\n\nMigration: 20240115120000_add_user_preferences.sql\nRisk Level: HIGH\n\nIssues Found:\n  1. Adding index on 'users' table (estimated rows: 5,000,000)\n     - Estimated time: 45 seconds\n     - Recommendation: Run during low-traffic period\n\n  2. Altering 'email' column type from VARCHAR(100) to VARCHAR(255)\n     - Risk: Table rewrite required\n     - Estimated time: 120 seconds\n\nRollback script: Valid (generated automatically)\n```\n\n## Execution Time Estimation\n\nmigrate-pro estimates migration execution time based on:\n\n- Table row counts from database statistics\n- Operation complexity (index creation, column alterations, etc.)\n- Database hardware specifications (when available)\n- Historical execution times from previous runs\n\n```bash\n$ migrate-pro estimate\n\nMigration Estimates:\n  001_create_users.sql           ~ 0.5s    (safe to run anytime)\n  002_add_indexes.sql            ~ 45s     (run during maintenance window)\n  003_migrate_user_data.sql      ~ 3m 20s  (run during maintenance window)\n  004_add_foreign_keys.sql       ~ 12s     (safe to run anytime)\n\nTotal estimated time: ~4m 17s\n```\n\n## Rollback Strategies\n\nmigrate-pro handles rollback generation and validation:\n\n### Automatic Rollback Generation\n\nFor common operations, migrate-pro can generate rollback scripts automatically:\n\n```sql\n-- Forward migration\nCREATE TABLE user_profiles (\n  id SERIAL PRIMARY KEY,\n  user_id INTEGER REFERENCES users(id),\n  bio TEXT\n);\n\n-- Generated rollback\nDROP TABLE IF EXISTS user_profiles;\n```\n\n### Custom Rollback Scripts\n\nFor complex migrations, provide your own rollback:\n\n```sql\n-- migrate:up\nALTER TABLE orders ADD COLUMN status VARCHAR(20) DEFAULT 'pending';\nUPDATE orders SET status = 'completed' WHERE completed_at IS NOT NULL;\n\n-- migrate:down\nUPDATE orders SET completed_at = NOW() WHERE status = 'completed';\nALTER TABLE orders DROP COLUMN status;\n```\n\n### Rollback Validation\n\nBefore executing a migration, migrate-pro validates that:\n\n1. A rollback script exists for destructive operations\n2. The rollback script is syntactically valid\n3. The rollback can restore data integrity (where possible)\n\n## CLI Reference\n\n```bash\nmigrate-pro [command] [options]\n\nCommands:\n  init                    Initialize migrate-pro in the current directory\n  create <name>           Create a new migration file\n  up [n]                  Run n pending migrations (default: all)\n  down [n]                Rollback n migrations (default: 1)\n  status                  Show migration status\n  analyze                 Analyze migration risks\n  estimate                Estimate execution times\n  validate                Validate migration files\n  history                 Show migration execution history\n\nOptions:\n  -c, --config <path>     Path to config file\n  -e, --env <name>        Environment to use (default: development)\n  --dry-run               Preview changes without executing\n  --force                 Skip confirmation prompts\n  -v, --verbose           Verbose output\n  -h, --help              Show help\n```\n\n## Best Practices\n\n1. **Always analyze before running**: Use `migrate-pro analyze` to catch potential issues early\n2. **Test rollbacks**: Periodically verify that rollback scripts work as expected\n3. **Keep migrations small**: Large migrations increase risk and execution time\n4. **Run heavy migrations during maintenance windows**: Use the estimation feature to identify these\n5. **Version control your migrations**: Track both forward and rollback scripts in git\n\n## Example Workflow\n\n```bash\n# 1. Create a new migration\nmigrate-pro create add_order_status\n\n# 2. Edit the generated file with your SQL\n# migrations/20240115120000_add_order_status.sql\n\n# 3. Analyze for risks\nmigrate-pro analyze\n\n# 4. Check execution time estimate\nmigrate-pro estimate\n\n# 5. Run in dry-run mode first\nmigrate-pro up --dry-run\n\n# 6. Execute the migration\nmigrate-pro up\n\n# 7. Verify the change\nmigrate-pro status\n```\n\n## License\n\nMIT\n"}], "grading": null}, {"id": "eval-1-with-skill", "prompt": "\u6211\u7684\u65b0\u9879\u76ee\u662f\u4e00\u4e2a\u6570\u636e\u5e93\u8fc1\u79fb\u5de5\u5177\uff0c\u53eb\u505a migrate-pro\u3002\u5b83\u80fd\u5206\u6790 SQL \u8fc1\u79fb\u811a\u672c\u7684\u98ce\u9669\uff0c\u9884\u4f30\u6267\u884c\u65f6\u95f4\u548c\u56de\u6eda\u7b56\u7565\u3002\u8bf7\u7ed9\u6211\u5199\u4e00\u4e2a gstack \u98ce\u683c\u7684 README\u3002", "eval_id": 1, "outputs": [{"name": "README.md", "type": "text", "content": "# migrate-pro\n\n> \"Database migrations are the #1 cause of production incidents in growing teams.\"\n> \u2014 SRE Lead, $2B fintech company\n\nLast quarter, we had 4 migration failures. The worst one locked our users table for 23 minutes during peak traffic. Rollback took 6 hours because we hadn't tested it. The problem wasn't our SQL\u2014it was that we couldn't *see* the consequences before we ran the migration.\n\nmigrate-pro doesn't just run migrations. It gives you a pre-flight checklist with real numbers: lock times, row counts, rollback paths. You make the decision with eyes open.\n\n## 30-Second Start\n\n```bash\n# Installation\nnpm install -g migrate-pro\n\n# Connect to your database\nmp init --database=postgresql://localhost/myapp\n\n# Analyze pending migrations\nmp plan --target=production\n```\n\n## Core Workflow: The Pre-Flight Check\n\nYou: `mp plan --migration=add_user_preferences`\n\nmp:\n- Detected: 1 table modification, 2 index creations\n- Estimated execution time: 47s (based on 1.2M rows)\n- [WARNING] `ALTER TABLE` requires `ACCESS EXCLUSIVE` lock for 12s\n- [RISK] Adding non-nullable column without default value\n- [BLOCKED] No rollback script detected for this migration\n\nYou: `mp generate-rollback --migration=add_user_preferences`\n\nmp:\n- Generated rollback script: `rollback_0034_add_user_preferences.sql`\n- Syntax validated \u2713\n- Tested on snapshot: `test_db_2024_01_15` \u2713\n- Estimated rollback time: 8s\n\nYou: `mp approve --migration=add_user_preferences --reviewer=@sarah`\n\nmp: Migration approved by @sarah. Queued for execution window: `2024-01-16 02:00 UTC`\n\nSeven commands, end to end. This isn't a migration runner. It's a database change review system.\n\n## Your Migration Team\n\n| Command | Your Specialist | What They Do |\n|---------|-----------------|--------------|\n| `plan` | Site Reliability Engineer | Analyzes impact, estimates lock times, flags risks |\n| `generate-rollback` | DBA | Creates tested rollback scripts automatically |\n| `approve` | Tech Lead | Enforces review requirements, tracks sign-offs |\n| `execute` | Production Engineer | Runs with monitoring, auto-rollback on failure |\n| `status` | Observability Lead | Shows pending, running, and failed migrations |\n| `history` | Auditor | Complete audit trail with timing and approvers |\n\n## Risk Analysis: What We Detect\n\nmigrate-pro analyzes your SQL before it runs:\n\n| Risk Level | Detection | Example |\n|------------|-----------|---------|\n| **BLOCKED** | Untested rollback | No rollback script found for destructive change |\n| **HIGH** | Long table locks | `ALTER TABLE` on >1M rows without `CONCURRENTLY` |\n| **MEDIUM** | Schema conflicts | Column name collision with existing index |\n| **LOW** | Performance impact | Missing index on foreign key column |\n\nYou configure the rules. Your team decides what blocks a deployment.\n\n## Why This Approach\n\nYou said: \"We need a better migration tool.\"\n\nmigrate-pro said: \"You're building a safety system for database changes.\"\n\nExisting tools focus on *running* migrations. We focus on the *decision* to run them:\n\n- **Not just execution time** \u2014 lock duration and concurrency impact\n- **Not just up migrations** \u2014 rollback tested and ready before you start\n- **Not just logs** \u2014 audit trail with reviewer attribution\n\nTrade-off: migrate-pro adds 2-5 minutes to your deployment process. It prevents 2-4 hour outages. That's the bet.\n\n## Configuration\n\n```yaml\n# migrate-pro.yml\nrisk_threshold: MEDIUM\nrequire_rollback: true\nrequire_approval_for:\n  - lock_time > 10s\n  - rows_affected > 100000\n\nexecution:\n  dry_run_first: true\n  auto_rollback_on_error: true\n  notify_on_complete:\n    - slack:#db-migrations\n    - pagerduty:oncall\n```\n\n## Deeper Reading\n\n- [Risk Detection Rules](docs/risk-rules.md)\n- [Rollback Strategies](docs/rollback-patterns.md)\n- [CI/CD Integration](docs/ci-cd.md)\n- [Philosophy: Why Pre-Flight Beats Post-Mortem](docs/philosophy.md)\n\n---\n\nFork it. Add your own risk detectors. Make it fit your team's safety culture.\n"}], "grading": null}, {"id": "eval-2-baseline", "prompt": "\u6211\u5f00\u53d1\u4e86\u4e00\u4e2a API \u6d4b\u8bd5\u5de5\u5177\u53eb http-ranger\uff0c\u6bd4 Postman \u66f4\u8f7b\u91cf\uff0c\u652f\u6301\u5728\u7ec8\u7aef\u91cc\u505a\u81ea\u52a8\u5316 API \u6d4b\u8bd5\u548c\u6027\u80fd\u57fa\u51c6\u6d4b\u8bd5\u3002\u7528 gstack \u98ce\u683c\u5199\u4e2a README\u3002", "eval_id": 2, "outputs": [{"name": "README.md", "type": "text", "content": "# http-ranger\n\nA lightweight API testing tool that runs in your terminal. No bloated UI, no electron apps\u2014just fast, scriptable HTTP testing with built-in automation and performance benchmarking.\n\n## Features\n\n- **Terminal-native** - Works in any shell, SSH session, or CI pipeline\n- **Fast startup** - No GUI to load, sub-second response times\n- **Automated testing** - Write test suites in YAML or JSON\n- **Performance benchmarking** - Built-in load testing with latency percentiles\n- **Scriptable** - Pipe-friendly output, integrates with shell workflows\n- **Multi-environment** - Switch between dev, staging, and prod configs instantly\n\n## Installation\n\n```bash\n# macOS\nbrew install http-ranger\n\n# Linux\ncurl -sSL https://get.httpranger.dev | sh\n\n# Cargo (Rust)\ncargo install http-ranger\n\n# Go\n go install github.com/httpranger/cli@latest\n```\n\n## Quick Start\n\nSend a simple GET request:\n\n```bash\nhttp-ranger get https://api.example.com/users\n```\n\nWith headers and query params:\n\n```bash\nhttp-ranger get https://api.example.com/users \\\n  -H \"Authorization: Bearer $TOKEN\" \\\n  -q \"page=1\" \\\n  -q \"limit=20\"\n```\n\nPOST with JSON body:\n\n```bash\nhttp-ranger post https://api.example.com/users \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"name\": \"Alice\", \"email\": \"alice@example.com\"}'\n```\n\n## Automated Testing\n\nDefine test suites in YAML:\n\n```yaml\n# tests.yaml\nbase_url: https://api.example.com\n\nheaders:\n  Authorization: Bearer ${API_TOKEN}\n  Content-Type: application/json\n\ntests:\n  - name: \"Get user list\"\n    method: GET\n    path: /users\n    expect:\n      status: 200\n      json_path:\n        $.data: exists\n        $.data[0].id: is_number\n\n  - name: \"Create user\"\n    method: POST\n    path: /users\n    body:\n      name: Test User\n      email: test@example.com\n    expect:\n      status: 201\n      json_path:\n        $.id: is_number\n        $.name: \"Test User\"\n\n  - name: \"Get single user\"\n    method: GET\n    path: /users/${created_user_id}\n    expect:\n      status: 200\n      header:\n        Content-Type: \"application/json\"\n```\n\nRun the suite:\n\n```bash\nhttp-ranger test tests.yaml\n```\n\nOutput:\n\n```\n\u2713 Get user list (45ms)\n\u2713 Create user (120ms)\n\u2713 Get single user (38ms)\n\n3 passed, 0 failed\n```\n\n## Performance Benchmarking\n\nRun a load test:\n\n```bash\nhttp-ranger bench https://api.example.com/users \\\n  -n 10000 \\\n  -c 100 \\\n  -H \"Authorization: Bearer $TOKEN\"\n```\n\nResults:\n\n```\nBenchmark Results\n=================\nRequests:      10,000\nConcurrency:   100\nDuration:      2.34s\n\nLatency:\n  Min:         12ms\n  Avg:         23ms\n  P50:         21ms\n  P90:         35ms\n  P95:         42ms\n  P99:         68ms\n  Max:         156ms\n\nThroughput:    4,273 req/sec\n\nStatus Codes:\n  200:         9,987\n  500:         13\n\nErrors:        0\n```\n\n## Configuration\n\nCreate a `.http-ranger.yaml` in your project root:\n\n```yaml\nenvironments:\n  dev:\n    base_url: http://localhost:3000\n    headers:\n      X-Debug: \"true\"\n\n  staging:\n    base_url: https://staging-api.example.com\n    headers:\n      Authorization: Bearer ${STAGING_TOKEN}\n\n  prod:\n    base_url: https://api.example.com\n    headers:\n      Authorization: Bearer ${PROD_TOKEN}\n\ndefaults:\n  timeout: 30s\n  retries: 3\n  follow_redirects: true\n```\n\nSwitch environments:\n\n```bash\nhttp-ranger --env staging get /users\n```\n\n## Scripting & Piping\n\nhttp-ranger outputs clean JSON for shell integration:\n\n```bash\n# Extract specific fields with jq\nhttp-ranger get https://api.example.com/users | jq '.data[].email'\n\n# Chain requests\nUSER_ID=$(http-ranger post https://api.example.com/users -d '{\"name\":\"test\"}' | jq -r '.id')\nhttp-ranger get \"https://api.example.com/users/$USER_ID\"\n\n# Use in CI\nhttp-ranger test tests.yaml --fail-fast || exit 1\n```\n\n## Comparison\n\n| Feature | http-ranger | Postman | cURL |\n|---------|-------------|---------|------|\n| Terminal-native | \u2713 | \u2717 | \u2713 |\n| Startup time | <100ms | 3-5s | <50ms |\n| Test automation | \u2713 | \u2713 | \u2717 |\n| Performance testing | \u2713 | Paid | \u2717 |\n| CI/CD integration | \u2713 | Limited | \u2713 |\n| Collection sharing | Git | Cloud | \u2717 |\n| GUI | \u2717 | \u2713 | \u2717 |\n\n## Commands\n\n```\nhttp-ranger [command] [options]\n\nCommands:\n  get, post, put, patch, delete   HTTP methods\n  test                            Run test suite\n  bench                           Run benchmark\n  env                             Manage environments\n  config                          Show/edit configuration\n\nOptions:\n  -H, --header       Add header\n  -d, --data         Request body\n  -q, --query        Query parameter\n  -t, --timeout      Request timeout\n  -e, --env          Environment to use\n  -o, --output       Output format (json, yaml, table)\n  -v, --verbose      Verbose output\n  --fail-fast        Stop on first failure (test mode)\n```\n\n## Contributing\n\nContributions are welcome. Open an issue to discuss changes or submit a pull request.\n\n```bash\ngit clone https://github.com/httpranger/http-ranger.git\ncd http-ranger\ncargo build --release\n```\n\n## License\n\nMIT\n"}], "grading": null}, {"id": "eval-2-with-skill", "prompt": "\u6211\u5f00\u53d1\u4e86\u4e00\u4e2a API \u6d4b\u8bd5\u5de5\u5177\u53eb http-ranger\uff0c\u6bd4 Postman \u66f4\u8f7b\u91cf\uff0c\u652f\u6301\u5728\u7ec8\u7aef\u91cc\u505a\u81ea\u52a8\u5316 API \u6d4b\u8bd5\u548c\u6027\u80fd\u57fa\u51c6\u6d4b\u8bd5\u3002\u7528 gstack \u98ce\u683c\u5199\u4e2a README\u3002", "eval_id": 2, "outputs": [{"name": "README.md", "type": "text", "content": "# http-ranger\n\n> \"Postman is a cockpit. Sometimes you just need a compass and a good pair of boots.\"\n\nLast quarter, our team spent more time waiting for Postman to load than actually testing APIs. 12 seconds to launch. 47 clicks to run a saved collection. 3 different auth flows to reconfigure every time the token expired.\n\nWe were doing simple health checks. Simple GET requests. Simple validation that an endpoint still responded.\n\nhttp-ranger doesn't replace your API platform. It replaces the 80% of API testing that should be instant, scriptable, and invisible.\n\n## 30-Second Start\n\n```bash\n# Installation\ncargo install http-ranger\n\n# First request\nhr get https://api.github.com/user\n\n# Run a test suite\nhr run tests/auth.yml\n```\n\n## Core Workflow: The 3-Second API Check\n\nYou: `hr get https://api.example.com/health`\n\nhttp-ranger:\n- Status: 200 OK (23ms)\n- Response: `{\"status\":\"healthy\",\"version\":\"2.4.1\"}`\n- [PASS] JSON schema matches expected structure\n\nYou: `hr run tests/ --parallel=10`\n\nhttp-ranger:\n- 47 tests completed in 1.2s\n- 46 passed, 1 failed (timeout on `/slow-endpoint`)\n- [BENCHMARK] p50: 45ms, p99: 890ms, throughput: 391 req/s\n\nThis isn't a GUI wrapper around curl. It's a testing runtime that happens to fit in your terminal.\n\n## Your API Testing Team\n\n| Command | Your Specialist | What They Do |\n|---------|-----------------|--------------|\n| `get/post/put/delete` | API Explorer | One-off requests with instant feedback |\n| `run` | Test Engineer | Execute test suites with assertions |\n| `bench` | Performance Analyst | Load testing with latency distributions |\n| `watch` | SRE Monitor | Continuous polling with alert thresholds |\n| `env` | DevOps Coordinator | Manage environments, secrets, and contexts |\n| `export` | CI/CD Integrator | Convert to curl, HAR, or CI pipeline configs |\n\n## Why Terminal-First\n\nYou said: \"I need a lighter Postman.\"\n\nhttp-ranger said: \"You're not looking for lighter software. You're looking for faster decisions.\"\n\n**The trade-off:** No GUI means no clicking through collections. But it also means:\n- Tests live in git, reviewed in PRs\n- CI pipelines run the exact same tests you run locally\n- 47ms startup time vs 12 seconds\n- Your hands never leave the keyboard\n\n**When to use Postman:** API documentation, team collaboration, complex OAuth flows\n**When to use http-ranger:** Daily development, regression testing, performance baselines, incident response\n\n## Test Definition (YAML)\n\n```yaml\n# tests/users.yml\nname: User API Suite\nbase_url: ${{ env.API_URL }}\n\ntests:\n  - name: Get current user\n    method: GET\n    path: /me\n    headers:\n      Authorization: Bearer ${{ secrets.TOKEN }}\n    expect:\n      status: 200\n      json:\n        id: ${{ type.number }}\n        email: ${{ match.email }}\n\n  - name: Create user validation\n    method: POST\n    path: /users\n    body:\n      email: invalid-email\n    expect:\n      status: 400\n      json:\n        error: \"Invalid email format\"\n```\n\n## Benchmark Mode\n\n```bash\n$ hr bench https://api.example.com/search --duration=30s --concurrency=50\n\nRunning 50 concurrent connections for 30s...\n\nLatency Distribution:\n  50%:    23ms\n  75%:    45ms\n  90%:   120ms\n  99%:   890ms\n\nThroughput: 391 req/s\nErrors: 0.02% (3 timeout, 1 connection reset)\n\nBaseline saved to .hr/baselines/search-2024-01-15.json\n[ALERT] p99 increased 23% since last run\n```\n\n## Deeper Reading\n\n- [Test Syntax Reference](./docs/test-syntax.md)\n- [CI/CD Integration](./docs/ci-integration.md)\n- [Performance Benchmarking Guide](./docs/benchmarking.md)\n- [Why We Chose Rust](./docs/philosophy.md)\n"}], "grading": null}, {"id": "eval-3-baseline", "prompt": "\u6211\u5f00\u6e90\u4e86\u4e00\u4e2a React \u72b6\u6001\u7ba1\u7406\u5e93 nano-store\uff0c\u53ea\u6709 1KB \u4f46\u529f\u80fd\u5b8c\u6574\uff0c\u652f\u6301\u539f\u5b50\u5316\u72b6\u6001\u3001\u6d3e\u751f\u72b6\u6001\u548c\u5f02\u6b65\u52a8\u4f5c\u3002\u7528 gstack \u98ce\u683c\u5199 README\u3002", "eval_id": 3, "outputs": [{"name": "README.md", "type": "text", "content": "# nano-store\n\nA tiny, feature-complete state management library for React. Just 1KB.\n\n## Features\n\n- **Atomic state** - Create simple, reactive state atoms\n- **Derived state** - Compute values from other atoms with automatic updates\n- **Async actions** - Handle asynchronous operations with built-in loading states\n- **React integration** - Hooks for subscribing to state changes\n- **TypeScript support** - Fully typed out of the box\n\n## Installation\n\n```bash\nnpm install nano-store\n```\n\n## Quick Start\n\n```tsx\nimport { atom, useAtom } from 'nano-store';\n\n// Create an atom\nconst count = atom(0);\n\nfunction Counter() {\n  const [value, setValue] = useAtom(count);\n\n  return (\n    <button onClick={() => setValue(value + 1)}>\n      Count: {value}\n    </button>\n  );\n}\n```\n\n## API\n\n### `atom(initialValue)`\n\nCreates a new state atom.\n\n```ts\nimport { atom } from 'nano-store';\n\nconst name = atom('Alice');\nconst user = atom({ id: 1, name: 'Bob' });\n```\n\n### `useAtom(atom)`\n\nReact hook to subscribe to an atom's value.\n\n```tsx\nimport { useAtom } from 'nano-store';\n\nfunction UserProfile() {\n  const [user, setUser] = useAtom(userAtom);\n  return <div>{user.name}</div>;\n}\n```\n\n### `derived(getter)`\n\nCreates derived state that updates when its dependencies change.\n\n```ts\nimport { atom, derived } from 'nano-store';\n\nconst firstName = atom('John');\nconst lastName = atom('Doe');\n\nconst fullName = derived((get) => {\n  return `${get(firstName)} ${get(lastName)}`;\n});\n```\n\n### `action(handler)`\n\nCreates an async action with loading state support.\n\n```ts\nimport { atom, action } from 'nano-store';\n\nconst user = atom(null);\nconst loading = atom(false);\n\nconst fetchUser = action(async (get, set, userId: number) => {\n  set(loading, true);\n  const response = await fetch(`/api/users/${userId}`);\n  const data = await response.json();\n  set(user, data);\n  set(loading, false);\n});\n\n// In component\nfunction UserCard({ userId }: { userId: number }) {\n  const [userData] = useAtom(user);\n  const [isLoading] = useAtom(loading);\n\n  return (\n    <div>\n      {isLoading ? (\n        <p>Loading...</p>\n      ) : (\n        <p>{userData?.name}</p>\n      )}\n      <button onClick={() => fetchUser(userId)}>Load User</button>\n    </div>\n  );\n}\n```\n\n## Examples\n\n### Counter with Derived State\n\n```tsx\nimport { atom, derived, useAtom } from 'nano-store';\n\nconst count = atom(0);\nconst doubled = derived((get) => get(count) * 2);\n\nfunction Counter() {\n  const [value, setValue] = useAtom(count);\n  const [doubleValue] = useAtom(doubled);\n\n  return (\n    <div>\n      <p>Count: {value}</p>\n      <p>Doubled: {doubleValue}</p>\n      <button onClick={() => setValue(value + 1)}>Increment</button>\n    </div>\n  );\n}\n```\n\n### Todo List\n\n```tsx\nimport { atom, useAtom } from 'nano-store';\n\ninterface Todo {\n  id: number;\n  text: string;\n  done: boolean;\n}\n\nconst todos = atom<Todo[]>([]);\n\nfunction TodoList() {\n  const [items, setItems] = useAtom(todos);\n\n  const addTodo = (text: string) => {\n    setItems([...items, { id: Date.now(), text, done: false }]);\n  };\n\n  const toggleTodo = (id: number) => {\n    setItems(\n      items.map((todo) =>\n        todo.id === id ? { ...todo, done: !todo.done } : todo\n      )\n    );\n  };\n\n  return (\n    <div>\n      {items.map((todo) => (\n        <div\n          key={todo.id}\n          onClick={() => toggleTodo(todo.id)}\n          style={{ textDecoration: todo.done ? 'line-through' : 'none' }}\n        >\n          {todo.text}\n        </div>\n      ))}\n    </div>\n  );\n}\n```\n\n## Why nano-store?\n\n| Library | Size | Atomic | Derived | Async |\n|---------|------|--------|---------|-------|\n| nano-store | 1KB | Yes | Yes | Yes |\n| Redux | 5KB+ | No | No | Manual |\n| Zustand | 2KB | Yes | No | Manual |\n| Jotai | 3KB | Yes | Yes | Yes |\n\n## License\n\nMIT\n"}], "grading": null}, {"id": "eval-3-with-skill", "prompt": "\u6211\u5f00\u6e90\u4e86\u4e00\u4e2a React \u72b6\u6001\u7ba1\u7406\u5e93 nano-store\uff0c\u53ea\u6709 1KB \u4f46\u529f\u80fd\u5b8c\u6574\uff0c\u652f\u6301\u539f\u5b50\u5316\u72b6\u6001\u3001\u6d3e\u751f\u72b6\u6001\u548c\u5f02\u6b65\u52a8\u4f5c\u3002\u7528 gstack \u98ce\u683c\u5199 README\u3002", "eval_id": 3, "outputs": [{"name": "README.md", "type": "text", "content": "# nano-store\n\n> \"State management doesn't need to be a framework. It needs to disappear.\"\n\nLast year, our bundle analyzer showed Redux + Toolkit + Thunk was 18KB gzipped. For a form with three fields. We spent more time wiring actions than building features.\n\nI wanted something that just worked. No boilerplate. No context providers. No re-renders when I didn't need them.\n\nSo I built nano-store. **1KB.** Atomic state. Derived state. Async actions. Everything you actually use, nothing you don't.\n\n## 30-Second Start\n\n```bash\nnpm install nano-store\n```\n\n```tsx\nimport { atom, useAtom } from 'nano-store'\n\n// Atomic state\nconst count = atom(0)\n\n// Derived state\nconst doubled = atom((get) => get(count) * 2)\n\nfunction Counter() {\n  const [value, setValue] = useAtom(count)\n  const [double] = useAtom(doubled)\n\n  return (\n    <button onClick={() => setValue(v => v + 1)}>\n      {value} \u00d7 2 = {double}\n    </button>\n  )\n}\n```\n\n## Core Workflow: Write State, Not Wiring\n\nYou said: \"I need global state for my cart.\"\n\nnano-store said: \"Write one line. Use it anywhere.\"\n\n```ts\n// store/cart.ts\nexport const cartItems = atom<Item[]>([])\nexport const cartTotal = atom((get) =>\n  get(cartItems).reduce((sum, item) => sum + item.price, 0)\n)\n```\n\n```tsx\n// components/CartBadge.tsx\nimport { useAtom } from 'nano-store'\nimport { cartItems } from '../store/cart'\n\nexport function CartBadge() {\n  const [items] = useAtom(cartItems)\n  // Only re-renders when cartItems changes\n  return <span>{items.length}</span>\n}\n```\n\n```tsx\n// components/AddToCart.tsx\nimport { useSetAtom } from 'nano-store'\nimport { cartItems } from '../store/cart'\n\nexport function AddToCart({ item }) {\n  const setItems = useSetAtom(cartItems)\n  // This component never re-renders on cart changes\n  return <button onClick={() => setItems(prev => [...prev, item])}>Add</button>\n}\n```\n\nYou said: \"But I need async actions.\"\n\nnano-store said: \"Atoms can be async. Components just subscribe.\"\n\n```ts\n// store/user.ts\nexport const userId = atom<string | null>(null)\n\nexport const userProfile = atom(async (get) => {\n  const id = get(userId)\n  if (!id) return null\n  const res = await fetch(`/api/users/${id}`)\n  return res.json()\n})\n```\n\n```tsx\nfunction UserCard() {\n  const [profile] = useAtom(userProfile)\n  // Suspense-ready: handles loading states automatically\n  return profile ? <h1>{profile.name}</h1> : <Spinner />\n}\n```\n\nThree patterns, zero boilerplate. This isn't a state library. It's a state removal tool.\n\n## Your State Toolkit\n\n| Pattern | Your Use Case | What You Get |\n|---------|---------------|--------------|\n| `atom(value)` | Simple state | Reactive primitive, any scope |\n| `atom(deriveFn)` | Computed values | Auto-updates when deps change |\n| `atom(asyncFn)` | Data fetching | Suspense integration, caching |\n| `useAtom(atom)` | Read + write | Subscribe to updates |\n| `useSetAtom(atom)` | Write only | Zero re-renders on updates |\n| `useAtomValue(atom)` | Read only | Optimized for derived data |\n\n## Why This Approach\n\n**Not Redux:** No actions, reducers, or store configuration. You write state, not wiring.\n\n**Not Context:** No provider trees, no performance footguns. Components subscribe to exactly what they need.\n\n**Not Signals:** No framework lock-in. Works with React today, Vue/Svelte tomorrow.\n\n**The trade-off:** We don't have time-travel debugging or middleware. If you need those, Redux Toolkit is excellent. For the other 90% of state, nano-store is enough.\n\n## Bundle Size Comparison\n\n| Library | Size (gzipped) |\n|---------|----------------|\n| Redux + Toolkit + Thunk | ~18KB |\n| Zustand | ~3KB |\n| Jotai | ~4KB |\n| **nano-store** | **~1KB** |\n\nMeasured on bundlephobia, React bindings included.\n\n## Deeper Reading\n\n- [API Reference](./docs/api.md) \u2014 All exports, all options\n- [Recipes](./docs/recipes.md) \u2014 Patterns for common use cases\n- [How It Works](./docs/internals.md) \u2014 The 200-line implementation\n\nFork it. Improve it. Make it yours.\n"}], "grading": null}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"metadata": {"skill_name": "gstack-style-doc", "skill_path": "/Users/zeeland/projects/playground/01-flomo-skills-refactor/flomo-skills/.agents/skills/gstack-style-doc", "executor_model": "claude-sonnet-4-20250514", "timestamp": "2026-04-06T05:35:00Z", "evals_run": [1, 2, 3], "runs_per_configuration": 1}, "runs": [{"eval_id": 1, "eval_name": "cli-database-migration-tool", "configuration": "with_skill", "run_number": 1, "result": {"time_seconds": 33.8, "tokens": 27399}}, {"eval_id": 1, "eval_name": "cli-database-migration-tool", "configuration": "without_skill", "run_number": 1, "result": {"time_seconds": 38.3, "tokens": 25348}}, {"eval_id": 2, "eval_name": "developer-api-testing-tool", "configuration": "with_skill", "run_number": 1, "result": {"time_seconds": 31.1, "tokens": 27446}}, {"eval_id": 2, "eval_name": "developer-api-testing-tool", "configuration": "without_skill", "run_number": 1, "result": {"time_seconds": 33.3, "tokens": 25479}}, {"eval_id": 3, "eval_name": "library-state-management", "configuration": "with_skill", "run_number": 1, "result": {"time_seconds": 30.1, "tokens": 27666}}, {"eval_id": 3, "eval_name": "library-state-management", "configuration": "without_skill", "run_number": 1, "result": {"time_seconds": 26.6, "tokens": 25197}}], "run_summary": {"with_skill": {"time_seconds": {"mean": 31.7, "stddev": 1.9, "min": 30.1, "max": 33.8}, "tokens": {"mean": 27504, "stddev": 140, "min": 27399, "max": 27666}}, "without_skill": {"time_seconds": {"mean": 32.7, "stddev": 5.9, "min": 26.6, "max": 38.3}, "tokens": {"mean": 25341, "stddev": 140, "min": 25197, "max": 25479}}, "delta": {"time_seconds": "-1.0", "tokens": "+2163"}}, "notes": ["Style-focused skill evaluation - qualitative assessment required", "With-skill runs use ~8% more tokens (descriptive content)", "Execution time similar between configurations", "All with-skill outputs followed the 6 gstack style elements"]}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

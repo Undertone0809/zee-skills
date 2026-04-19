@@ -1,0 +1,23 @@
+{
+  "skill_name": "gstack-style-doc",
+  "evals": [
+    {
+      "id": 1,
+      "name": "cli-database-migration-tool",
+      "prompt": "我的新项目是一个数据库迁移工具，叫做 migrate-pro。它能分析 SQL 迁移脚本的风险，预估执行时间和回滚策略。请给我写一个 gstack 风格的 README。",
+      "expected_output": "A gstack-style README with hook-first narrative, reasoning transparency, specific metrics, conversational tone, and progressive disclosure structure"
+    },
+    {
+      "id": 2,
+      "name": "developer-api-testing-tool",
+      "prompt": "我开发了一个 API 测试工具叫 http-ranger，比 Postman 更轻量，支持在终端里做自动化 API 测试和性能基准测试。用 gstack 风格写个 README。",
+      "expected_output": "A gstack-style README featuring a provocative hook, personal narrative about API testing pain points, workflow examples showing the tool's unique approach, and role-based feature descriptions"
+    },
+    {
+      "id": 3,
+      "name": "library-state-management",
+      "prompt": "我开源了一个 React 状态管理库 nano-store，只有 1KB 但功能完整，支持原子化状态、派生状态和异步动作。用 gstack 风格写 README。",
+      "expected_output": "A gstack-style README with a hook about state management complexity, reasoning about why small is better, specific size/performance metrics, and pattern-based documentation"
+    }
+  ]
+}

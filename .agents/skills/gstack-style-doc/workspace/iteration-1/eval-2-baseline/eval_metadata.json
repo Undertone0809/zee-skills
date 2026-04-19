@@ -1,0 +1,6 @@
+{
+  "eval_id": 2,
+  "eval_name": "developer-api-testing-tool",
+  "prompt": "我开发了一个 API 测试工具叫 http-ranger，比 Postman 更轻量，支持在终端里做自动化 API 测试和性能基准测试。用 gstack 风格写个 README。",
+  "assertions": []
+}

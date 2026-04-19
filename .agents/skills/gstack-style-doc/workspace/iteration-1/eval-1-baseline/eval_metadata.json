@@ -1,0 +1,6 @@
+{
+  "eval_id": 1,
+  "eval_name": "cli-database-migration-tool",
+  "prompt": "我的新项目是一个数据库迁移工具，叫做 migrate-pro。它能分析 SQL 迁移脚本的风险，预估执行时间和回滚策略。请给我写一个 gstack 风格的 README。",
+  "assertions": []
+}
