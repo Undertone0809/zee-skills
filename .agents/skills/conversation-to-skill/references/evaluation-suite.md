@@ -7,6 +7,19 @@ This is the full evaluation suite.
 Do not reduce it to "run one prompt and eyeball it" unless the host truly
 cannot support more.
 
+This skill bundles the required evaluation support files locally:
+
+- `agents/grader.md`
+- `agents/comparator.md`
+- `agents/analyzer.md`
+- `eval-viewer/generate_review.py`
+- `assets/eval_review.html`
+- `scripts/*.py`
+- `references/compatibility.md`
+- `references/schemas.md`
+
+Prefer these local copies over reaching into another skill directory.
+
 ## When To Use This
 
 Use the full suite when at least one of these is true:
@@ -215,10 +228,10 @@ inspection.
 
 Once all runs are graded, aggregate the iteration into benchmark artifacts.
 
-If the `skill-creator` toolchain is available, reuse its existing script:
+Run the local aggregation script from the skill root:
 
 ```bash
-python -m scripts.aggregate_benchmark <workspace>/iteration-N --skill-name <name>
+python scripts/aggregate_benchmark.py <workspace>/iteration-N --skill-name <name>
 ```
 
 Expected outputs:
@@ -246,10 +259,10 @@ it is useful.
 Do not stop at `benchmark.json`.
 Always generate a reviewable artifact for the human.
 
-If the `skill-creator` viewer is available, use its existing generator:
+Generate the review viewer with the local bundled script:
 
 ```bash
-nohup python <skill-creator-path>/eval-viewer/generate_review.py \
+nohup python eval-viewer/generate_review.py \
   <workspace>/iteration-N \
   --skill-name "<name>" \
   --benchmark <workspace>/iteration-N/benchmark.json \
@@ -361,7 +374,7 @@ If the host has no browser or display:
 For headless review generation, prefer:
 
 ```bash
-python <skill-creator-path>/eval-viewer/generate_review.py \
+python eval-viewer/generate_review.py \
   <workspace>/iteration-N \
   --skill-name "<name>" \
   --benchmark <workspace>/iteration-N/benchmark.json \
@@ -373,10 +386,10 @@ python <skill-creator-path>/eval-viewer/generate_review.py \
 If the user wants a distributable skill package and the appropriate tooling is
 available, package it after the skill is stable.
 
-If the `skill-creator` packaging script is available, reuse it:
+If the user wants packaging, use the local bundled script:
 
 ```bash
-python -m scripts.package_skill <path/to/skill-folder>
+python scripts/package_skill.py <path/to/skill-folder>
 ```
 
 ## Final Rule

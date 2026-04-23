@@ -23,8 +23,10 @@ actually help a future agent perform better.
 
 When useful, this skill should borrow the practical methods of `skill-creator`:
 good descriptions, clean skill structure, eval-friendly organization, and an
-improve-via-feedback loop. Do not blindly copy that skill. Reuse the know-how
-that helps this specific workflow.
+improve-via-feedback loop. When this skill owns evaluation, bundle the relevant
+toolchain locally under `agents/`, `assets/`, `eval-viewer/`, `scripts/`, and
+`references/` so it stays self-contained instead of depending on another skill
+directory at runtime.
 
 ## Use This Skill For
 
@@ -279,6 +281,9 @@ If the user wants more than a draft, or explicitly asks for testing,
 benchmarking, or trigger tuning, add local references that capture the
 evaluation workflow instead of leaving that logic implicit.
 
+If the workflow needs actual tooling, prefer bundling it inside this skill
+rather than pointing at another repo's copy.
+
 ### 9. Bundle Repeated Deterministic Work
 
 If multiple runs of the workflow would obviously repeat the same deterministic
@@ -318,6 +323,14 @@ The detailed procedure lives in:
 
 - `references/evaluation-suite.md` for test execution, grading, benchmark aggregation, feedback, and iteration
 - `references/description-optimization.md` for trigger-query generation and description tuning
+- `references/compatibility.md` and `references/schemas.md` for host differences and file formats
+
+The local support toolchain lives in:
+
+- `agents/` for grader, comparator, and analyst instructions
+- `assets/` for review UI assets
+- `eval-viewer/` for viewer generation
+- `scripts/` for aggregation, optimization, validation, and packaging
 
 If you decide evals are needed, read those reference files before proceeding.
 

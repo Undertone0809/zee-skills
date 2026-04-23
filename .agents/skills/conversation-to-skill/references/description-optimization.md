@@ -45,8 +45,8 @@ somewhere else.
 ## Step 2. Review the query set with the user
 
 Before running the loop, let the user review the query set.
-If the `skill-creator` HTML review asset is available, reuse it to present and
-edit the eval set.
+Use the local bundled HTML review asset in `assets/eval_review.html` to present
+and edit the eval set.
 
 The template workflow is:
 
@@ -60,10 +60,10 @@ This step matters because poor trigger queries produce poor descriptions.
 
 ## Step 3. Run the optimization loop
 
-If the `skill-creator` tooling is available, reuse its loop:
+Run the local bundled optimization loop from the skill root:
 
 ```bash
-python -m scripts.run_loop \
+python scripts/run_loop.py \
   --eval-set <path-to-trigger-eval.json> \
   --skill-path <path-to-skill> \
   --backend auto \
