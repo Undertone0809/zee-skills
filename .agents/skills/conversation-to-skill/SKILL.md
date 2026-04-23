@@ -275,6 +275,10 @@ Use progressive disclosure:
 When the skill supports multiple variants or domains, organize references by
 variant and tell the future agent which file to read for which case.
 
+If the user wants more than a draft, or explicitly asks for testing,
+benchmarking, or trigger tuning, add local references that capture the
+evaluation workflow instead of leaving that logic implicit.
+
 ### 9. Bundle Repeated Deterministic Work
 
 If multiple runs of the workflow would obviously repeat the same deterministic
@@ -292,19 +296,30 @@ Good candidates:
 Do not add scripts just because you can.
 Only bundle work that is repeated, stable, and cheaper to reuse than to re-derive.
 
-### 10. Add Evals When The Skill Warrants Them
+### 10. Add Evals With The Full Suite When The Skill Warrants Them
 
 Not every conversation-derived skill needs evals.
-But if the skill produces objectively testable outputs, or if the user wants to
-improve the skill rather than just draft it, add a lightweight evaluation loop.
+But if the skill produces objectively testable outputs, if the user asks for
+benchmarking, or if you are iterating on quality instead of just drafting, do
+not stop at a hand-wavy "light eval."
 
-Default pattern:
+When you choose to evaluate, use the full evaluation suite:
 
-- create 2-3 realistic test prompts
-- store them in `evals/evals.json`
-- if improving an existing skill, compare the new version to the old version or to no skill
-- use a sibling workspace for iteration results
-- let the user review outputs before making another round of changes
+- create 2-3 realistic test prompts and store them in `evals/evals.json`
+- create a sibling `<skill-name>-workspace/` for iteration outputs
+- compare `with_skill` against `without_skill` or an old snapshot
+- draft assertions while runs are executing
+- capture timing and grading artifacts per run
+- aggregate results into a benchmark
+- generate a reviewable viewer artifact for the human
+- read feedback, improve the skill, and rerun into the next iteration
+
+The detailed procedure lives in:
+
+- `references/evaluation-suite.md` for test execution, grading, benchmark aggregation, feedback, and iteration
+- `references/description-optimization.md` for trigger-query generation and description tuning
+
+If you decide evals are needed, read those reference files before proceeding.
 
 Prefer qualitative review for subjective skills.
 Prefer assertions and benchmarks for objective skills.
@@ -385,7 +400,7 @@ Strong skills often also have at least one of these:
 - a well-targeted description that triggers reliably
 - a clean placement and file layout
 - a bundled helper for repeated deterministic work
-- a small eval loop that makes improvements testable
+- a full eval loop that makes improvements testable
 
 If it captures none of those, it is probably not a real skill yet.
 
