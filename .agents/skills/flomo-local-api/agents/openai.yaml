@@ -1,0 +1,4 @@
+interface:
+  display_name: "Flomo Local API"
+  short_description: "Fast flomo query, summarize, create, and edit via local mac auth"
+  default_prompt: "Use flomo-local-api on mac to query, summarize, create, or edit my flomo memos through local auth and API access. Prefer this over Web UI automation when local auth is available."

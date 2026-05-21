@@ -1,0 +1,60 @@
+{
+  "skill_name": "flomo-analysis-studio",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "基于我的 flomo，分析一下我最近到底在想什么。不要只做总结，我更想知道最近 30 天和过去一年相比，什么是新出现的，什么是一直没变的。最后告诉我接下来还值得继续分析什么。",
+      "expected_output": "A structured overview analysis that compares short and long time windows, names repeated tensions, cites evidence, and suggests next analysis directions.",
+      "files": [],
+      "expectations": [
+        "Uses an overview-style structure instead of a raw memo dump",
+        "Compares recent and longer-term windows explicitly",
+        "Ends with 2-3 suggested follow-up analysis directions"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "帮我从 flomo 里做一次盲区探索。我不想听好听的话，直接指出 3 个我可能一直没看见、但其实会改变结果的模式。每个点都要有 memo 证据，而且最后给我一个最该停止重复的东西。",
+      "expected_output": "A sharp blind-spot analysis with three evidence-based blind spots, not vague encouragement, plus one concrete pattern to stop repeating.",
+      "files": [],
+      "expectations": [
+        "Produces exactly three blind spots or three clearly separated blind-spot findings",
+        "Grounds each blind spot in memo evidence",
+        "Ends with one thing the user should stop repeating"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "从我的 flomo 猜一下我的 MBTI，但要老实一点。你可以给一个主要假设和一个备选，不要装成正式测评。重点解释你为什么这么猜。",
+      "expected_output": "An MBTI-style reading framed as a hypothesis, with explicit uncertainty, evidence, and an alternative reading.",
+      "files": [],
+      "expectations": [
+        "Clearly states this is not a formal personality assessment",
+        "Provides a main hypothesis and an alternative",
+        "Explains the reasoning with memo-based evidence"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "我也不知道该分析什么。你先基于我的 flomo 帮我看一下，现在最值得分析的 2 到 3 个方向是什么，并直接挑一个最重要的做一版分析。不要让我先做选择题。",
+      "expected_output": "A guided-entry analysis that proposes 2-3 promising lenses, explains why they fit, and then directly performs one primary analysis instead of stopping at options.",
+      "files": [],
+      "expectations": [
+        "Proposes 2-3 analysis directions with rationale",
+        "Does not bounce the choice back to the user before doing useful work",
+        "Completes one primary analysis in the same response"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "帮我从 flomo 里找一下，什么东西最可能形成我的复利飞轮。不要给我鸡血，重点说清楚：为什么它会复利，卡点又是什么，接下来该继续加码什么。",
+      "expected_output": "A compounding-flywheel analysis that identifies one or two believable flywheel hypotheses, explains the compounding mechanism, names the friction, and gives a practical reinforcement direction.",
+      "files": [],
+      "expectations": [
+        "Separates compounding interest from mere repeated obligation",
+        "Explains the mechanism of compounding, not just the topic",
+        "Names a concrete friction or bottleneck and what to reinforce next"
+      ]
+    }
+  ]
+}

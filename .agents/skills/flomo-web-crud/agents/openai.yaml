@@ -1,0 +1,4 @@
+interface:
+  display_name: "Flomo Web CRUD"
+  short_description: "Operate live flomo memos through Chrome MCP Web UI automation"
+  default_prompt: "Use flomo-web-crud to search, create, edit, or delete live flomo memos in my logged-in browser session. Prefer this for non-mac users, live Web UI workflows, or when local API access is unavailable."

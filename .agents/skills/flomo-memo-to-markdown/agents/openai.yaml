@@ -1,0 +1,4 @@
+interface:
+  display_name: "Flomo Memo to Markdown"
+  short_description: "Export flomo memos into grouped Markdown files and tag stats via local auth"
+  default_prompt: "Use flomo-memo-to-markdown to export my flomo memos from local auth/API into grouped Markdown files and a tag statistics report for AI or NotebookLM reading."

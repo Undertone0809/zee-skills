@@ -1,0 +1,4 @@
+interface:
+  display_name: "Flomo Analysis Studio"
+  short_description: "Analyze yourself from flomo notes using guided reflection lenses"
+  default_prompt: "Use flomo-analysis-studio on mac to analyze me from my flomo notes. Use flomo-local-api as the data layer, then help me understand my themes, tensions, blind spots, actions, or MBTI-style signals."
