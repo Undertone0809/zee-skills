@@ -12,7 +12,5 @@ technical detail.
 ## Install
 
 ```bash
-npx skills add Undertone0809/zee-agent-skills
+npx skills add Undertone0809/zee-agent-skills/gstack-style-doc
 ```
-
-Use the CLI prompt to select `gstack-style-doc`.

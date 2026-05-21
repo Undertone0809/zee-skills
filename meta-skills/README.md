@@ -15,10 +15,10 @@ extract, and improve other Agent Skills.
 
 ## Install
 
-Install from the root repository:
+Install the meta-skills collection:
 
 ```bash
-npx skills add Undertone0809/zee-agent-skills
+npx skills add Undertone0809/zee-agent-skills/meta-skills
 ```
 
 Use the CLI prompt to install all meta skills or only the one you need.

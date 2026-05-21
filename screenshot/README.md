@@ -11,7 +11,5 @@ tool-specific capture path is not a better fit.
 ## Install
 
 ```bash
-npx skills add Undertone0809/zee-agent-skills
+npx skills add Undertone0809/zee-agent-skills/screenshot
 ```
-
-Use the CLI prompt to select `screenshot`.

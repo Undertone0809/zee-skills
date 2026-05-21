@@ -12,6 +12,6 @@ Guidance for human and AI contributors working in this repository.
 
 - Keep top-level skill folders at the repository root. Do not add new maintained skills under the repository root `.agents/skills` path.
 - Every top-level skill folder or skill collection needs its own `README.md`.
-- The root README should stay as a navigation page: link to each folder README and keep one generic install command.
-- Use `npx skills add Undertone0809/zee-agent-skills` as the default install command for this repository. The CLI can let users choose one skill, several skills, or all skills.
-- If a nested collection has its own install surface, use the collection path. For example, `flomo-skills` should document `npx skills add Undertone0809/zee-agent-skills/flomo-skills`.
+- The root README should stay as a navigation page: link to each folder README and show the folder-specific install commands.
+- Use `npx skills add Undertone0809/zee-agent-skills/<folder>` as the default install shape. The CLI detects skills under that folder and can let users choose one skill, several skills, or all skills.
+- Do not document `npx skills add Undertone0809/zee-agent-skills` as the install command for nested collections such as `meta-skills` or `flomo-skills`; it will not inspect those collection folders correctly.
