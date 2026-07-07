@@ -52,6 +52,8 @@ def parse_args() -> argparse.Namespace:
     query.add_argument("--end-date")
     query.add_argument("--limit", type=int, default=20)
     query.add_argument("--format", choices=["json", "markdown"], default="json")
+    query.add_argument("--sort", choices=["newest", "oldest"], default="newest")
+    query.add_argument("--include-files", action="store_true", help="Include memo attachment metadata and image URLs")
 
     summarize = sub.add_parser("summarize", help="Summarize recent memo themes")
     summarize.add_argument("--days", type=int, default=30)
@@ -62,6 +64,7 @@ def parse_args() -> argparse.Namespace:
         "--output-dir",
         default=str(Path.home() / "download" / "flomo-markdown-export-monthly"),
     )
+    export.add_argument("--include-files", action="store_true", help="Render memo attachments and image URLs in markdown exports")
 
     tags = sub.add_parser("tags", help="Inspect existing flomo tags and their frequencies")
     tags.add_argument("--query", help="Case-insensitive substring filter on tag names")
@@ -303,6 +306,42 @@ def add_derived_fields(memo: dict) -> dict:
     }
 
 
+def public_file_fields(file: dict) -> dict:
+    return {
+        "id": file.get("id"),
+        "type": file.get("type"),
+        "name": file.get("name"),
+        "size": file.get("size"),
+        "url": file.get("url"),
+        "thumbnail_url": file.get("thumbnail_url"),
+    }
+
+
+def memo_public_files(memo: dict) -> List[dict]:
+    return [public_file_fields(file) for file in memo.get("files", []) if isinstance(file, dict)]
+
+
+def markdown_file_lines(files: List[dict]) -> List[str]:
+    if not files:
+        return []
+
+    lines = ["", "Files:"]
+    for index, file in enumerate(files, start=1):
+        file_type = file.get("type") or "file"
+        name = file.get("name") or f"attachment-{index}"
+        url = file.get("url") or ""
+        thumbnail_url = file.get("thumbnail_url") or ""
+        if file_type == "image" and url:
+            lines.extend([f"- image {index}: {name}", f"  ![]({url})"])
+            if thumbnail_url and thumbnail_url != url:
+                lines.append(f"  thumbnail: {thumbnail_url}")
+        elif url:
+            lines.append(f"- {file_type} {index}: [{name}]({url})")
+        else:
+            lines.append(f"- {file_type} {index}: {name}")
+    return lines
+
+
 def date_in_range(memo: dict, start_date: Optional[str], end_date: Optional[str]) -> bool:
     created = memo["created_at"][:10]
     if start_date and created < start_date:
@@ -346,7 +385,9 @@ def command_query(args: argparse.Namespace) -> int:
     if args.days:
         start_date = (datetime.now() - timedelta(days=args.days)).strftime("%Y-%m-%d")
         end_date = datetime.now().strftime("%Y-%m-%d")
-    hits = filter_memos(memos, args.keyword, args.tag, start_date, end_date)[: args.limit]
+    hits = filter_memos(memos, args.keyword, args.tag, start_date, end_date)
+    hits = sorted(hits, key=lambda memo: memo["created_at"], reverse=args.sort == "newest")
+    hits = hits[: args.limit]
 
     if args.format == "json":
         payload = [
@@ -356,6 +397,7 @@ def command_query(args: argparse.Namespace) -> int:
                 "url": memo_web_url(memo["slug"]),
                 "tags": memo["tags"],
                 "snippet": snippet(memo["markdown"]),
+                **({"files": memo_public_files(memo)} if args.include_files else {}),
             }
             for memo in hits
         ]
@@ -373,9 +415,11 @@ def command_query(args: argparse.Namespace) -> int:
                 f"- url: {memo_web_url(memo['slug'])}",
                 f"- slug: {memo['slug']}",
                 f"- tags: {', '.join(memo['tags']) if memo['tags'] else '(none)'}",
-                "",
             ]
         )
+        if args.include_files:
+            lines.extend(markdown_file_lines(memo_public_files(memo)))
+        lines.append("")
     print("\n".join(lines))
     return 0
 
@@ -384,7 +428,11 @@ def command_summarize(args: argparse.Namespace) -> int:
     memos = [add_derived_fields(m) for m in fetch_all_memos()]
     start_date = (datetime.now() - timedelta(days=args.days)).strftime("%Y-%m-%d")
     end_date = datetime.now().strftime("%Y-%m-%d")
-    recent = filter_memos(memos, None, None, start_date, end_date)
+    recent = sorted(
+        filter_memos(memos, None, None, start_date, end_date),
+        key=lambda memo: memo["created_at"],
+        reverse=True,
+    )
 
     tag_counter: Counter[str] = Counter()
     for memo in recent:
@@ -702,7 +750,10 @@ def command_export_monthly(args: argparse.Namespace) -> int:
                 lines.extend([f"## {memo_date}", ""])
             lines.extend([f"### {memo_time}", "", memo["markdown"], "", f"- created_at: `{memo['created_at']}`"])
             if memo.get("files"):
-                lines.append(f"- files: {len(memo['files'])}")
+                if args.include_files:
+                    lines.extend(markdown_file_lines(memo_public_files(memo)))
+                else:
+                    lines.append(f"- files: {len(memo['files'])}")
             lines.append("")
         (out_dir / f"{month}.md").write_text("\n".join(lines), encoding="utf-8")
 
