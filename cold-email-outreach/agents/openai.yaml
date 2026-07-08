@@ -1,0 +1,7 @@
+interface:
+  display_name: "Cold Email Outreach"
+  short_description: "Onboard and run human-approved outbound email workflows."
+  default_prompt: "Use $cold-email-outreach to set up or run a cold email outreach workflow."
+
+policy:
+  allow_implicit_invocation: true

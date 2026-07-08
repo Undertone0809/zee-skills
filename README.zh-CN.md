@@ -21,6 +21,7 @@ practice
 - [`codex-insights`](codex-insights/README.md)：从本地 Codex session 历史生成 Claude Code `/insights` 风格的使用洞察报告。
 - [`gstack-style-doc`](gstack-style-doc/README.md)：生成 gstack 风格的技术文档。
 - [`screenshot`](screenshot/README.md)：截取桌面、应用、窗口、区域或全屏截图。
+- [`cold-email-outreach`](cold-email-outreach/README.md)：运行人工审核的 B2B 冷邮件外联流程。
 
 每个文件夹的 README 会说明包含哪些 skill、怎么安装、适合在什么场景使用。
 
@@ -73,6 +74,7 @@ npx skills add Undertone0809/zee-agent-skills/flomo-skills
 npx skills add Undertone0809/zee-agent-skills/codex-insights
 npx skills add Undertone0809/zee-agent-skills/gstack-style-doc
 npx skills add Undertone0809/zee-agent-skills/screenshot
+npx skills add Undertone0809/zee-agent-skills/cold-email-outreach
 ```
 
 `meta-skills` 和 `flomo-skills` 这类文件夹里有多个 skills。CLI 会让你选择安装一个、多个或全部。

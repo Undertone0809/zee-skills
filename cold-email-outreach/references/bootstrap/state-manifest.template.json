@@ -1,0 +1,28 @@
+{
+  "skill": "cold-email-outreach",
+  "onboarding_version": 1,
+  "completed_at": null,
+  "user_confirmed": false,
+  "state_owner": {
+    "skill_assets": "skill-folder",
+    "project_assets": ".cold-email-outreach/",
+    "agent_state": "agent-memory-or-workspace",
+    "ephemeral_state": "current-session"
+  },
+  "campaign": {
+    "language": "en-US",
+    "product_name": null,
+    "icp": null,
+    "decision_maker_roles": [],
+    "cta": null,
+    "follow_up_policy": {
+      "max_follow_ups": 3,
+      "interval_business_days": "3-5"
+    }
+  },
+  "boundaries": {
+    "auto_send_email": false,
+    "invent_social_proof": false,
+    "store_credentials": false
+  }
+}

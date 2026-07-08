@@ -31,6 +31,8 @@ practice
   a gstack-inspired style.
 - [`screenshot`](screenshot/README.md): capture desktop, app, window, region, or
   full-screen screenshots.
+- [`cold-email-outreach`](cold-email-outreach/README.md): run human-approved B2B
+  cold email outreach workflows.
 
 Open a folder README for the detailed skill list and usage notes.
 
@@ -97,6 +99,7 @@ npx skills add Undertone0809/zee-agent-skills/flomo-skills
 npx skills add Undertone0809/zee-agent-skills/codex-insights
 npx skills add Undertone0809/zee-agent-skills/gstack-style-doc
 npx skills add Undertone0809/zee-agent-skills/screenshot
+npx skills add Undertone0809/zee-agent-skills/cold-email-outreach
 ```
 
 For folders that contain multiple skills, such as `meta-skills` and

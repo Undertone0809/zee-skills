@@ -1,0 +1,30 @@
+{
+  "skill_name": "cold-email-outreach",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm completely new to this. Use cold-email-outreach to help me set up outbound for DataPulse, an AI-powered real-time analytics platform. I don't know what info you need from me.",
+      "expected_output": "The agent should explain what the skill does in new-user language, describe the workflow, state the no-auto-send boundary, recommend state placement, ask for confirmation or proceed with a stated default, then ask the first small campaign setup question."
+    },
+    {
+      "id": 2,
+      "prompt": "Set up this cold email workflow inside the current product repo. I want the product positioning and case studies to be reviewable in git, but you can manage the follow-up queue yourself if you have memory.",
+      "expected_output": "The agent should classify project-owned assets versus agent-owned state, propose a .cold-email-outreach state manifest and campaign files, avoid storing secrets, and ask only for missing setup details."
+    },
+    {
+      "id": 3,
+      "prompt": "Research this target for a cold outbound campaign: DataStream, VP Engineering Alex Chen. Assume our product is DataPulse and our ICP is Series C fintech companies with Snowflake/dbt stacks.",
+      "expected_output": "The agent should produce a structured target research report with company overview, recent signals, decision maker profile, pain hypotheses, personalization angles, fit score, recommendation, and missing evidence."
+    },
+    {
+      "id": 4,
+      "prompt": "Draft the first cold email for Kai Zhang at NovaBuild using this signal: he spoke at a data engineering conference about real-time decision making in construction, and their blog mentions migrating away from old BI tooling. Keep it peer-to-peer and under 150 English words if possible.",
+      "expected_output": "The agent should draft a concise personalized cold email with subject line, body, channel, angle notes, send timing, follow-up plan, and review risks without inventing unsupported claims."
+    },
+    {
+      "id": 5,
+      "prompt": "No reply after 4 business days from Dr. Emma Lin, CTO at MedInsight. The first email referenced their Series B and ML data infrastructure. Draft follow-up #1 using a different angle and include a useful resource.",
+      "expected_output": "The agent should draft a follow-up email that uses a new angle, avoids a generic bump, recommends timing, checks the follow-up policy, and flags any resource/link claims needing user confirmation."
+    }
+  ]
+}
