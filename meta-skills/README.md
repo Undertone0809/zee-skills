@@ -3,8 +3,8 @@
 [中文](README.zh-CN.md)
 
 Meta skills help you create, evolve, evaluate, and package other Agent Skills.
-They are for builders who treat skills as living software, not one-time
-prompts.
+This collection now exposes one maintained skill, `skill-creator`, for the full
+skill engineering loop.
 
 ## Why Meta Skills
 
@@ -14,9 +14,9 @@ triggers, unclear assumptions, brittle workflows, tool gaps, weak outputs, user
 corrections, and repeated failure modes.
 
 The core idea behind meta skills is simple: practice makes perfect. Real work
-should produce evidence. Evidence should become failure classes, workflow
-patches, trigger evals, validation cases, and reviewable changes. That is how
-agent capability improves systematically over time.
+should produce evidence. Evidence should become new skills, failure classes,
+workflow patches, trigger evals, validation cases, and reviewable changes. That
+is how agent capability improves systematically over time.
 
 Meta skills are not about writing longer prompts. They are a skill engineering
 loop:
@@ -48,23 +48,17 @@ easier to trigger, or easier to evaluate.
 
 ## Common Scenarios
 
-The most common workflow is optimizing Agent Skills from real practice:
+The most common workflow is maintaining Agent Skills from real practice:
 
 ```text
 Look at the latest 30 Codex sessions. Considering the existing skills, are there
-any new workflows that should become conversation-to-skill outputs?
+any new workflows that should become skills, or existing skills that need
+optimization?
 ```
 
-Use [`conversation-to-skill`](conversation-to-skill/SKILL.md) to identify
-reusable workflows from recent sessions and generate new skill packages.
-
-```text
-Look at the latest 30 Codex sessions. Considering the existing skills, which
-project skills need optimization?
-```
-
-Use [`skill-optimizer`](skill-optimizer/SKILL.md) to improve existing skills
-from traces, user corrections, failure classes, and validation results.
+Use [`skill-creator`](skill-creator/SKILL.md) to separate new-skill candidates
+from existing-skill patches, then produce the skill change, evals, validation
+cases, benchmark plan, or package.
 
 You can also use meta skills for narrower requests:
 
@@ -80,25 +74,18 @@ loop. You do not need heavy manual process. A small amount of human feedback,
 captured from real sessions, is enough when it is reviewed systematically.
 
 In Claude Code, Codex, OpenClaw, or any agent runtime that supports scheduled
-work, create two daily automation tasks:
+work, create a daily automation task:
 
 ```text
 Look at the latest 30 Codex sessions. Considering the existing skills, are there
-any new workflows that should become Conversation to Skill outputs?
+any new workflows that should become skills, or existing skills that need
+optimization with Skill Creator?
 ```
 
-Use [`conversation-to-skill`](conversation-to-skill/SKILL.md) to turn repeated
-successful workflows, corrected procedures, and emerging SOPs into new skill
-packages.
-
-```text
-Look at the latest 30 Codex sessions. Considering the existing skills, which
-project skills need optimization with Skill Optimizer?
-```
-
-Use [`skill-optimizer`](skill-optimizer/SKILL.md) to turn user corrections,
-execution failures, missed triggers, weak outputs, and validation gaps into
-small reviewable patches.
+Use [`skill-creator`](skill-creator/SKILL.md) to turn repeated successful
+workflows, corrected procedures, emerging SOPs, execution failures, missed
+triggers, weak outputs, and validation gaps into new skill packages or small
+reviewable patches.
 
 Each report should include:
 
@@ -108,19 +95,16 @@ Each report should include:
 - the suggested skill change
 - the eval, trigger case, or validation case that would prove the change works
 
-With those two reports, the human feedback loop stays small: review the
-recommendations, approve the high-signal patches, and let the next day's
+With that report, the human feedback loop stays small: review the
+recommendations, approve the high-signal changes, and let the next day's
 sessions test whether the skills improved.
 
 ## Skills
 
-- [`skill-creator`](skill-creator/SKILL.md): create new skills, refine existing
-  skills, run evaluation loops, and package skill artifacts.
-- [`conversation-to-skill`](conversation-to-skill/SKILL.md): turn a useful
-  conversation or repeated workflow into a reusable skill package.
-- [`skill-optimizer`](skill-optimizer/SKILL.md): improve, harden, benchmark, or
-  refactor an existing skill from evidence, failures, traces, and user
-  corrections.
+- [`skill-creator`](skill-creator/SKILL.md): create new skills from real
+  practice, improve existing skills from evidence, run evaluation loops,
+  optimize trigger descriptions, benchmark behavior, and package skill
+  artifacts.
 
 ## Install
 
@@ -130,18 +114,16 @@ Install the meta-skills collection:
 npx skills add Undertone0809/zee-agent-skills/meta-skills
 ```
 
-The CLI can let you install all meta skills or only the ones you need.
+The collection currently contains one maintained skill: `skill-creator`.
 
 ## How To Use
 
-Start from one of two paths:
+Start from one of two paths inside `skill-creator`:
 
-1. Create a new skill: use
-   [`conversation-to-skill`](conversation-to-skill/SKILL.md) to extract a
-   reusable workflow from a conversation, SOP, team process, or successful run.
-2. Improve an existing skill: use
-   [`skill-optimizer`](skill-optimizer/SKILL.md) to diagnose, patch, validate,
-   and benchmark an existing skill from real evidence.
+1. Create a new skill: extract a reusable workflow from a conversation, SOP,
+   team process, or successful run.
+2. Improve an existing skill: diagnose, patch, validate, and benchmark an
+   existing skill from real evidence.
 
 If you are not sure whether to create or optimize, ask the agent to review
 recent sessions against the existing skill set. It should separate new skill
