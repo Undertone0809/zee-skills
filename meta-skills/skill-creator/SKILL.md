@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: "Create, improve, evaluate, benchmark, and package Agent Skills. Use when users want to create a skill from scratch, turn a conversation, SOP, repeated workflow, or successful run into a reusable skill, edit or optimize an existing skill from evidence, run evals, benchmark performance, tune trigger descriptions, or package skill artifacts."
+description: Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.
 ---
 
 # Skill Creator
@@ -29,15 +29,7 @@ Of course, you should always be flexible and if the user is like "I don't need t
 
 Then after the skill is done (but again, the order is flexible), you can also run the skill description improver, which we have a whole separate script for, to optimize the triggering of the skill.
 
-## Working modes
-
-Choose the smallest mode that fits the user's request:
-
-- **Create from conversation**: Use when the user wants to turn the current conversation, a repeated workflow, an SOP, a prompt pattern, a successful run, or user corrections into a new skill. Extract durable procedure, remove one-off context, redact sensitive details, and produce a focused skill package.
-- **Improve existing skill**: Use when the user wants to optimize, harden, refactor, validate, benchmark, package, or document an existing skill. Start from the current `SKILL.md`, supporting files, execution evidence, user corrections, eval failures, or traces. Produce a small reviewable patch and validation cases.
-- **Evaluate or package**: Use when the user has a draft or existing skill and needs with-skill vs baseline runs, assertions, grading, the eval viewer, blind comparison, trigger-description tuning, or distributable packaging.
-
-If the user is not sure whether to create a new skill or improve an existing one, inspect the evidence first. Create a new skill only when the workflow has a distinct reusable owner. Patch an existing skill when the behavior belongs to a skill that already exists.
+Cool? Cool.
 
 ## Communicating with the user
 
@@ -79,29 +71,6 @@ Based on the user interview, fill in these components:
 - **the rest of the skill :)**
 
 If the target host is Codex/OpenAI, create or update `agents/openai.yaml` when the skill should appear cleanly in product UI, provide a default prompt, declare MCP dependencies, or control implicit invocation. See `references/compatibility/codex.md`.
-
-### Create from a conversation
-
-When the source is a conversation or observed workflow, build an evidence ledger before drafting:
-
-```md
-| Evidence from conversation | Durable meaning | Skill instruction implied |
-|---|---|---|
-| ... | ... | ... |
-```
-
-Classify each detail as a reusable workflow rule, user/team preference, domain requirement, one-off instruction, sensitive detail, or open question. Preserve the process, not the accidental details of one run. Remove API keys, credentials, private identifiers, temporary local paths, and one-time deadlines unless the user explicitly wants a private/team-specific skill and the information is safe to store.
-
-### Improve an existing skill from evidence
-
-When patching an existing skill, diagnose before rewriting. For each meaningful observation, capture:
-
-- Evidence: what happened or what the user corrected.
-- Root cause: why the current skill allowed it.
-- Durable change: what should be added, removed, or clarified.
-- Validation case: how a future run will prove the behavior improved.
-
-Prefer small, auditable patches over broad rewrites. Preserve the target skill's identity, useful examples, and safety constraints. Never silently weaken approval, privacy, deployment, deletion, publishing, financial, medical, legal, hiring, or permissions safeguards.
 
 ### Skill Writing Guide
 
