@@ -1,0 +1,7 @@
+interface:
+  display_name: "Editorial Room"
+  short_description: "Stress-test public writing from conflicting perspectives"
+  default_prompt: "Use $editorial-room to review this public post from conflicting audience perspectives and return the strongest publication-ready version."
+
+policy:
+  allow_implicit_invocation: true

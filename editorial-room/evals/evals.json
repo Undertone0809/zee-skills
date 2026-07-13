@@ -1,0 +1,32 @@
+{
+  "skill_name": "editorial-room",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我要在 X 发一个 Rudder 内置浏览器的 20 秒演示视频。我的原始想法是：在 Rudder 里可以一边看 Agent 的回答，一边核对原始网页，不需要切换应用；未来浏览器会越来越像 Agent 工作区的一部分。我还想说，也许 OpenAI 收掉 Atlas，是因为浏览器放进 Codex 比做成独立产品更合理。请做一次多视角发文效果模拟，迭代后给我中英文版本。不要直接把 Atlas 观点删掉。",
+      "expected_output": "A clear editorial decision informed by conflicting perspectives, with focused and provocative routes considered, a publication-ready Chinese and English result, and the Atlas claim preserved as an explicitly speculative thesis or first reply rather than unsupported fact.",
+      "files": [],
+      "expectations": [
+        "The process records four conflicting reviewer roles and a fifth blind comparison.",
+        "The work considers focused and provocative directions that make materially different choices about emphasis or Atlas placement.",
+        "The final answer makes one clear editorial recommendation instead of returning an unranked list of drafts.",
+        "The final answer contains publication-ready Chinese and English copy.",
+        "The Atlas idea is preserved as explicit speculation, interpretation, or a separate reply rather than asserted as verified causality.",
+        "The effect simulation is qualitative and covers likely resonance, objection, or risk without inventing engagement metrics."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "帮我 review 这条 Founder Post，模拟发出去以后开发者、潜在付费用户和同行会怎么反应。原稿：'We removed Rudder's free plan. Free users gave us more signups, but almost none of the hard product feedback we need. Charging earlier may slow growth, but it forces us to build for people with a real problem.' 我不想要五个人一起劝我写得安全，也不要只给一堆版本。请让不同立场真正冲突，最后替我做判断并给出英文成稿。",
+      "expected_output": "An adversarial editorial review that distinguishes reach, product positioning, evidence risk, and founder intent; produces meaningfully different focused and provocative candidates; chooses one; and returns a concise English post with qualitative audience reactions.",
+      "files": [],
+      "expectations": [
+        "The process records four conflicting reviewer roles and a fifth blind comparison.",
+        "The work considers focused and provocative candidates that reflect meaningfully different editorial objectives.",
+        "The final answer chooses one direction and provides a publication-ready English post.",
+        "The final copy preserves the founder's thesis about charging earlier rather than replacing it with generic safe language.",
+        "The effect simulation distinguishes likely reactions from developers, potential paying users, and peers without inventing engagement metrics."
+      ]
+    }
+  ]
+}
